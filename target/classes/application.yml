@@ -1,0 +1,36 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: camvels-inventario
+  datasource:
+    url: jdbc:mysql://localhost:3306/camvels?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
+    username: root
+    password: admin
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-init-sql: SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  jackson:
+    default-property-inclusion: non_null
+
+camvels:
+  jwt:
+    secret: camvels-inventario-jwt-secret-key-minimo-256-bits-para-hs256-seguridad
+    expiration-ms: 28800000
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000
+  mail:
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    user: ${SMTP_USER:}
+    password: ${SMTP_PASSWORD:}
