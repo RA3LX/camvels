@@ -13,34 +13,41 @@ export default function ProductForm() {
   const [form, setForm] = useState(empty);
   const [suppliers, setSuppliers] = useState([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     api.get('/products/suppliers').then((r) => setSuppliers(r.data));
     if (id) {
       api.get(`/products/${id}`).then((r) => setForm(r.data));
+    } else {
+      setForm(empty);
+      setError('');
     }
   }, [id]);
 
   const submit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError('');
     try {
       const payload = { ...form, proveedorId: form.proveedorId || null };
       if (id) await api.put(`/products/${id}`, payload);
-      else await api.post('/products', payload);
+      else await api.post('/products', { ...payload, id: 0 });
       navigate('/products');
     } catch (err) {
       setError(err.response?.data?.error || 'Error al guardar');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const set = (k, v) => setForm({ ...form, [k]: v });
+  const set = (k, v) => setForm((prev) => ({ ...prev, [k]: v }));
 
   return (
     <div className="container">
       <h1>{id ? 'Editar' : 'Nuevo'} producto</h1>
-      {error && <div className="alert alert-danger">{error}</div>}
-      <form className="card card-body form-grid" onSubmit={submit}>
+      <form className="card card-body form-grid" onSubmit={submit} noValidate>
+        {error && <div className="alert alert-danger">{error}</div>}
         <label>Código<input required value={form.codigo} onChange={(e) => set('codigo', e.target.value)} /></label>
         <label>Nombre<input required value={form.nombre} onChange={(e) => set('nombre', e.target.value)} /></label>
         <label>Categoría<input required value={form.categoria} onChange={(e) => set('categoria', e.target.value)} /></label>
@@ -61,8 +68,8 @@ export default function ProductForm() {
           </select>
         </label>
         <div className="form-actions">
-          <button className="btn btn-primary" type="submit">Guardar</button>
-          <button className="btn btn-secondary" type="button" onClick={() => navigate('/products')}>Cancelar</button>
+          <button className="btn btn-primary" type="submit" disabled={loading}>{loading ? 'Guardando...' : 'Guardar'}</button>
+          <button className="btn btn-secondary" type="button" onClick={() => navigate('/products')} disabled={loading}>Cancelar</button>
         </div>
       </form>
     </div>

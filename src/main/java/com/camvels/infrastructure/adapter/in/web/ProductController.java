@@ -36,19 +36,20 @@ public class ProductController {
         return productPort.listar(categoria, estado, busqueda);
     }
 
+    @GetMapping("/suppliers")
+    public List<?> suppliers() {
+        return productPort.listarProveedores();
+    }
+
     @GetMapping("/{id}")
     public Producto get(@PathVariable int id) {
         return productPort.buscarPorId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping("/suppliers")
-    public List<?> suppliers() {
-        return productPort.listarProveedores();
-    }
-
     @PostMapping
     public Producto create(@RequestBody Producto producto) {
+        producto.setId(0);
         Usuario usuario = currentUser();
         if (!productPort.guardar(producto, usuario)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se pudo guardar el producto");

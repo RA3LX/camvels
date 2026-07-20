@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import api from '../api/client';
 
 export default function Movements() {
+  const location = useLocation();
   const [items, setItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({ tipo: '', producto: '' });
@@ -12,7 +13,7 @@ export default function Movements() {
     api.get('/movements/products').then((r) => setProducts(r.data));
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [location.pathname]);
 
   return (
     <div className="container">

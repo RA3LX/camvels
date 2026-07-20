@@ -1,5 +1,8 @@
 package com.camvels.infrastructure.persistence;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
@@ -17,7 +20,7 @@ public class JdbcConnectionProvider {
     public Connection getConnection() throws SQLException {
         Connection conn = TRANSACTIONAL.get();
         if (conn != null) {
-            return conn;
+            return nonClosing(conn);
         }
         return dataSource.getConnection();
     }
@@ -28,5 +31,18 @@ public class JdbcConnectionProvider {
 
     public static void unbind() {
         TRANSACTIONAL.remove();
+    }
+
+    private static Connection nonClosing(Connection delegate) {
+        InvocationHandler handler = (proxy, method, args) -> {
+            if ("close".equals(method.getName())) {
+                return null;
+            }
+            return method.invoke(delegate, args);
+        };
+        return (Connection) Proxy.newProxyInstance(
+                Connection.class.getClassLoader(),
+                new Class<?>[]{Connection.class},
+                handler);
     }
 }

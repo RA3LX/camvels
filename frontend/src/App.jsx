@@ -25,7 +25,7 @@ export default function App() {
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="products" element={<Products />} />
-            <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/new" element={<ProductForm key="products-new" />} />
             <Route path="products/:id/edit" element={<ProductForm />} />
             <Route path="categories" element={<ProtectedRoute roles={['admin', 'supervisor']}><Categories /></ProtectedRoute>} />
             <Route path="categories/new" element={<ProtectedRoute roles={['admin', 'supervisor']}><CategoryForm /></ProtectedRoute>} />
@@ -34,7 +34,7 @@ export default function App() {
             <Route path="suppliers/new" element={<SupplierForm />} />
             <Route path="suppliers/:id/edit" element={<SupplierForm />} />
             <Route path="movements" element={<ProtectedRoute roles={['admin', 'supervisor']}><Movements /></ProtectedRoute>} />
-            <Route path="movements/new" element={<ProtectedRoute roles={['admin', 'supervisor']}><MovementForm /></ProtectedRoute>} />
+            <Route path="movements/new" element={<ProtectedRoute roles={['admin', 'supervisor']}><MovementForm key="movements-new" /></ProtectedRoute>} />
             <Route path="users" element={<ProtectedRoute roles={['admin']}><Users /></ProtectedRoute>} />
             <Route path="users/new" element={<ProtectedRoute roles={['admin']}><UserForm /></ProtectedRoute>} />
             <Route path="users/:id/edit" element={<ProtectedRoute roles={['admin']}><UserForm /></ProtectedRoute>} />

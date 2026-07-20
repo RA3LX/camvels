@@ -1,6 +1,7 @@
 package com.camvels.infrastructure.adapter.in.web;
 
 import com.camvels.domain.exception.DomainException;
+import java.sql.SQLException;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +46,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneric(Exception ex) {
+        Throwable cause = ex.getCause();
+        while (cause != null) {
+            if (cause instanceof DomainException domainEx) {
+                return ResponseEntity.badRequest().body(Map.of("error", domainEx.getMessage()));
+            }
+            if (cause instanceof SQLException sqlEx) {
+                logger.error("Database error: {}", sqlEx.getMessage(), sqlEx);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "Error de base de datos: " + sqlEx.getMessage()));
+            }
+            cause = cause.getCause();
+        }
         logger.error("Unhandled exception", ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Error interno del servidor"));
+        String message = ex.getMessage() != null ? ex.getMessage() : "Error interno del servidor";
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", message));
     }
 }
